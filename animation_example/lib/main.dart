@@ -24,7 +24,9 @@ class AnimationApp extends StatefulWidget {
 }
 class _AnimationApp extends State<AnimationApp> {
   List<People> peoples = new List.empty(growable: true);
+  Color weightColor = Colors.blue;
   int current = 0;
+  double _opacity = 1;
 
   @override
   void initState() {
@@ -37,6 +39,18 @@ class _AnimationApp extends State<AnimationApp> {
     super.initState();
   }
 
+  void _changeWeightColor(double weight) {
+    if (weight < 40) {
+      weightColor = Colors.blueAccent;
+    } else if (weight < 60) {
+      weightColor = Colors.indigo;
+    } else if (weight < 80) {
+      weightColor = Colors.orange;
+    } else {
+      weightColor = Colors.red;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,46 +61,51 @@ class _AnimationApp extends State<AnimationApp> {
         child: Center(
           child: Column(
             children: <Widget>[
-              SizedBox(
+              AnimatedOpacity(opacity: _opacity, duration: Duration(seconds: 1),
+              child: SizedBox(
                 child: Row(
                   children: <Widget>[
                     SizedBox(width: 100, child: Text('이름 : ${peoples[current].name}')),
                     AnimatedContainer(duration: Duration(seconds: 2),curve: Curves.bounceIn,
-                    color: Colors.amber,
-                    child: Text(
-                      '키 ${peoples[current].height}',
-                      textAlign: TextAlign.center,
-                    ),
-                    width: 50,
-                    height: peoples[current].height,),
-                    AnimatedContainer(duration: Duration(seconds: 2),curve: Curves.easeInCubic, color: Colors.blue,
-                    child: Text(
-                      '몸무게 ${peoples[current].weight}',
-                      textAlign: TextAlign.center,
-                    ),
-                    width: 50,
+                      color: Colors.amber,
+                      child: Text(
+                        '키 ${peoples[current].height}',
+                        textAlign: TextAlign.center,
+                      ),
+                      width: 50,
+                      height: peoples[current].height,),
+                    AnimatedContainer(duration: Duration(seconds: 2),
+                      curve: Curves.easeInCubic,
+                      color: weightColor,
+                      child: Text(
+                        '몸무게 ${peoples[current].weight}',
+                        textAlign: TextAlign.center,
+                      ),
+                      width: 50,
                       height: peoples[current].weight,
                     ),
                     AnimatedContainer(duration: Duration(seconds: 2),
-                    curve: Curves.linear,
-                    color: Colors.pinkAccent,
-                    child: Text(
-                      'bmi ${peoples[current].bmi.toString().substring(0, 2)}',
-                      textAlign: TextAlign.center,
-                    ),
-                    width: 50,
-                    height: peoples[current].bmi,)
+                      curve: Curves.linear,
+                      color: Colors.pinkAccent,
+                      child: Text(
+                        'bmi ${peoples[current].bmi.toString().substring(0, 2)}',
+                        textAlign: TextAlign.center,
+                      ),
+                      width: 50,
+                      height: peoples[current].bmi,)
                   ],
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.end,
                 ),
                 height: 200,
               ),
+              ),
               ElevatedButton(onPressed: () {
                 setState(() {
                   if (current < peoples.length - 1) {
                     current ++;
                   }
+                  _changeWeightColor(peoples[current].weight);
                 });
               }, child: Text('다음'), ),
               ElevatedButton(onPressed: () {
@@ -94,8 +113,17 @@ class _AnimationApp extends State<AnimationApp> {
                   if (current > 0) {
                     current --;
                   }
+                  _changeWeightColor(peoples[current].weight);
                 });
-              }, child: Text('이전'),)
+              }, child: Text('이전'), ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _opacity == 1 ? _opacity = 0 : _opacity = 1;
+                  });
+                },
+                child: Text('사라지기'),
+              )
             ],
             mainAxisAlignment: MainAxisAlignment.center,
           ),
